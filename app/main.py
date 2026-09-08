@@ -66,8 +66,12 @@ async def lifespan(app: FastAPI):
     """Lifespan context manager for startup and shutdown."""
     # Startup
     logger.info("🚀 Starting Dental Clinic Agent...")
-    init_db()
-    logger.info("✅ Database initialized")
+    try:
+        init_db()
+        logger.info("✅ Database initialized")
+    except Exception as e:
+        logger.warning(f"⚠️ Database init failed (non-blocking): {e}")
+    logger.info("✅ Agent ready")
     yield
     # Shutdown
     logger.info("👋 Shutting down...")
