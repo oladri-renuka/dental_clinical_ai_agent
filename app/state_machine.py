@@ -531,5 +531,22 @@ class ConversationStateMachine:
             return self.escalation_node(state)
 
 
-# Global state machine instance
-state_machine = ConversationStateMachine()
+# Global state machine instance (lazy-loaded)
+_state_machine_instance = None
+
+def get_state_machine():
+    global _state_machine_instance
+    if _state_machine_instance is None:
+        _state_machine_instance = ConversationStateMachine()
+    return _state_machine_instance
+
+# For backward compatibility
+class LazyStateMachine:
+    @property
+    def graph(self):
+        return get_state_machine().graph
+
+    def __getattr__(self, name):
+        return getattr(get_state_machine(), name)
+
+state_machine = LazyStateMachine()
