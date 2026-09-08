@@ -3,8 +3,8 @@ uvicorn==0.24.0
 twilio==8.10.0
 vonage==3.4.0
 faster-whisper==0.10.0
-langraph==0.0.20
-langgraph-checkpoint==0.1.1
+langgraph==0.2.0
+langgraph-checkpoint==0.2.0
 pydantic==2.5.0
 pydantic-settings==2.1.0
 redis==5.0.1
