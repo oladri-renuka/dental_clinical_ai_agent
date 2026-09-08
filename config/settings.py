@@ -2,7 +2,12 @@ import os
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    # Twilio Configuration
+    # Vonage Configuration
+    VONAGE_API_KEY: str = os.getenv("VONAGE_API_KEY", "")
+    VONAGE_API_SECRET: str = os.getenv("VONAGE_API_SECRET", "")
+    VONAGE_PHONE_NUMBER: str = os.getenv("VONAGE_PHONE_NUMBER", "")
+
+    # Twilio Configuration (legacy)
     TWILIO_ACCOUNT_SID: str = os.getenv("TWILIO_ACCOUNT_SID", "")
     TWILIO_AUTH_TOKEN: str = os.getenv("TWILIO_AUTH_TOKEN", "")
     TWILIO_PHONE_NUMBER: str = os.getenv("TWILIO_PHONE_NUMBER", "")
