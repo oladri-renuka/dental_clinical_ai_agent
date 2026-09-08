@@ -18,17 +18,29 @@ class WhisperService:
     """Speech-to-text using faster-whisper (local, no API key required)."""
 
     def __init__(self):
-        """Initialize Faster-Whisper service with local model."""
-        self.model = None
-        if FASTER_WHISPER_AVAILABLE:
+        """Initialize Faster-Whisper service (lazy-loaded)."""
+        self._model = None
+        logger.info("📝 WhisperService initialized (lazy-loaded, will load on first use)")
+
+    def _get_model(self):
+        """Lazy-load Whisper model on first use."""
+        if self._model is None:
+            if not FASTER_WHISPER_AVAILABLE:
+                logger.warning("faster-whisper not available")
+                return None
             try:
-                # Load small model (~140MB) for faster inference on CPU
-                # Models: tiny, base, small, medium, large
-                self.model = WhisperModel("base", device="cpu", compute_type="int8")
-                logger.info("✅ Faster-Whisper model loaded (base, CPU)")
+                logger.info("📥 Loading Faster-Whisper model (base, CPU) - this takes ~30 seconds on first run...")
+                self._model = WhisperModel("base", device="cpu", compute_type="int8")
+                logger.info("✅ Faster-Whisper model loaded successfully!")
             except Exception as e:
                 logger.error(f"❌ Error loading Whisper model: {e}")
-                self.model = None
+                return None
+        return self._model
+
+    @property
+    def model(self):
+        """Get or load the Whisper model."""
+        return self._get_model()
 
     def transcribe_audio(self, audio_data: bytes) -> Optional[str]:
         """

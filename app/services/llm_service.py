@@ -11,29 +11,32 @@ class LLMService:
     """LLM integration using OpenRouter (OpenAI-compatible API)."""
 
     def __init__(self):
-        print(f"🔧 [DEBUG] LLM Init: Starting...")
+        logger.info("📝 LLMService initialized (lazy-loaded)")
         self.api_key = settings.OPENROUTER_API_KEY
         self.model = settings.LLM_MODEL
-        self.client = None
+        self._client = None
 
-        print(f"🔧 [DEBUG] API Key: {self.api_key[:20] if self.api_key else 'NOT SET'}...")
-        print(f"🔧 [DEBUG] Model: {self.model}")
-
-        if self.api_key:
+    def _get_client(self):
+        """Lazy-load OpenAI client on first use."""
+        if self._client is None:
+            if not self.api_key:
+                logger.warning("⚠️ OPENROUTER_API_KEY not set")
+                return None
             try:
-                print(f"🔧 [DEBUG] Creating OpenAI client...")
-                self.client = OpenAI(
+                self._client = OpenAI(
                     api_key=self.api_key,
                     base_url="https://openrouter.ai/api/v1"
                 )
-                print(f"✅ [DEBUG] OpenRouter LLM initialized successfully!")
-                logger.info(f"✅ OpenRouter LLM initialized with model: {self.model}")
+                logger.info(f"✅ OpenRouter client created for model: {self.model}")
             except Exception as e:
-                print(f"❌ [DEBUG] Failed to initialize: {e}")
-                logger.error(f"❌ Failed to initialize OpenRouter: {e}")
-        else:
-            print(f"❌ [DEBUG] OPENROUTER_API_KEY not set!")
-            logger.warning("⚠️ OPENROUTER_API_KEY not set")
+                logger.error(f"❌ Failed to create OpenRouter client: {e}")
+                return None
+        return self._client
+
+    @property
+    def client(self):
+        """Get or create the OpenAI client."""
+        return self._get_client()
 
     def detect_intent(self, user_input: str, conversation_history: list = None, current_intent: str = None, slots: Dict = None) -> Dict[str, Any]:
         """Detect intent with structured hard rules FIRST, then LLM validation.

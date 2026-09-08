@@ -64,14 +64,23 @@ else:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup and shutdown."""
-    # Startup
-    logger.info("🚀 Starting Dental Clinic Agent...")
+    # Startup - log immediately
+    print("=" * 60)
+    print("🚀 [STARTUP] Dental Clinic AI Agent booting up...")
+    print("=" * 60)
+    logger.info("🚀 [STARTUP] FastAPI app is starting")
+
     try:
+        logger.info("📊 Initializing database...")
         init_db()
         logger.info("✅ Database initialized")
     except Exception as e:
         logger.warning(f"⚠️ Database init failed (non-blocking): {e}")
-    logger.info("✅ Agent ready")
+
+    print("=" * 60)
+    print("✅ [READY] Agent is listening on 0.0.0.0:8000")
+    print("=" * 60)
+    logger.info("✅ Agent ready - waiting for requests")
     yield
     # Shutdown
     logger.info("👋 Shutting down...")
@@ -83,6 +92,18 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+
+# ==================== HEALTH CHECK ====================
+
+@app.get("/health")
+async def health_check():
+    """Fast health check - does NOT touch LLMService or Whisper."""
+    return JSONResponse({
+        "status": "ok",
+        "service": "Dental Clinic AI Agent",
+        "version": "1.0.0"
+    })
 
 
 # ==================== WEBHOOK ENDPOINTS ====================
