@@ -30,11 +30,25 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Initialize services
-llm_service = LLMService()
-whisper_service = WhisperService()
-elevenlabs_service = ElevenLabsService()
-sms_rating_service = SMSRatingService()
+# Initialize services (lazy-loaded)
+try:
+    llm_service = LLMService()
+except Exception as e:
+    logger.warning(f"⚠️ LLM service init error: {e}")
+    llm_service = None
+
+whisper_service = None  # Load on first use
+try:
+    elevenlabs_service = ElevenLabsService()
+except Exception as e:
+    logger.warning(f"⚠️ ElevenLabs init error: {e}")
+    elevenlabs_service = None
+
+try:
+    sms_rating_service = SMSRatingService()
+except Exception as e:
+    logger.warning(f"⚠️ SMS rating service init error: {e}")
+    sms_rating_service = None
 
 # Vonage configuration
 vonage_api_key = os.getenv("VONAGE_API_KEY")
