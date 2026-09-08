@@ -4,7 +4,7 @@ twilio==8.10.0
 vonage==3.4.0
 faster-whisper==0.10.0
 langgraph==0.2.0
-langgraph-checkpoint==0.2.0
+langgraph-checkpoint==2.1.2
 pydantic==2.5.0
 pydantic-settings==2.1.0
 redis==5.0.1
